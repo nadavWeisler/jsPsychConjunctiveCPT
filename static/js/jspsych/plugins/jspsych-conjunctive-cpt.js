@@ -1,6 +1,128 @@
 /*
  * Example plugin template
  */
+class Shape {
+  constructor(color, shape, obj) {
+    this.color = color;
+    this.shape = shape;
+    this.obj = obj;
+  }
+}
+
+class Shapes {
+  static getSquere(width, height, color) {
+    let squere = document.createElement('canvas');
+    squere.id = "squere";
+    squere.style.width = width + "cm";
+    squere.style.height = height + "cm";
+    squere.style.background = color;
+    squere.style.zIndex = 2;
+    squere.style.position = "absolute";
+    squere.style.display = "none";
+    return new Shape(color, "squere", squere);
+  }
+
+  static getCircle(width, height, color) {
+    let circle = document.createElement('canvas');
+    circle.id = "circle";
+    circle.style.width = width + "cm";
+    circle.style.height = height + "cm";
+    circle.style.borderRadius = "50%";
+    circle.style.background = color;
+    circle.style.zIndex = 2;
+    circle.style.position = "absolute";
+    circle.style.display = "none";
+    return new Shape(color, "circle", circle);
+  }
+
+  static getTriangle(width, height, color) {
+    let triangle = document.createElement('canvas');
+    triangle.id = "triangle";
+    triangle.style.width = 0;
+    triangle.style.height = 0;
+    triangle.style.borderLeft = width / 2 + "cm solid transparent";
+    triangle.style.borderRight = width / 2 + "cm solid transparent";
+    triangle.style.borderBottom = height + "cm solid " + color;
+    triangle.style.zIndex = 2;
+    triangle.style.position = "absolute";
+    triangle.style.display = "none";
+    return new Shape(color, "triangle", triangle);
+  }
+
+  static getTriangleDown(width, height, color) {
+    let triangle = document.createElement('canvas');
+    triangle.style.width = 0;
+    triangle.style.height = 0;
+    triangle.style.borderLeft = width / 2 + "cm solid transparent";
+    triangle.style.borderRight = width / 2 + "cm solid transparent";
+    triangle.style.borderTop = height + "cm solid " + color;
+    triangle.style.zIndex = 2;
+    triangle.style.position = "absolute";
+    triangle.style.display = "none";
+    return new Shape(color, "triangle", triangle);
+  }
+}
+
+function shuffle(array) {
+  let currentIndex = array.length, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (currentIndex != 0) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+      array[randomIndex], array[currentIndex]];
+  }
+
+  return array;
+}
+
+function getAllStimulus(trials_count, stimulus_percentage, stimulus) {
+  return new Array(trials_count * (stimulus_percentage / 100)).fill(stimulus);
+}
+
+function getDistractors(trials_count, percentage, distractors) {
+  let all_distractors = [];
+  let one_distractor = [];
+  for (var dis in distractors) {
+    one_distractor = new Array(Math.floor(trials_count * (percentage / 100) / distractors.length)).fill(distractors[dis]);
+    all_distractors.push(...one_distractor);
+  }
+  for (var i = 0; i < Math.abs((trials_count * (percentage / 100)) - all_distractors.length); i++) {
+    all_distractors.push(distractors[i]);
+  }
+  return all_distractors;
+}
+
+const getAllTrials = (trials_count, stimulus_percentage, stimulus, same_color_percentage, same_color_distractors, same_shape_percentage, same_shape_distractors, other_percentage, other_distractors) => {
+  let all_trials = getAllStimulus(trials_count, stimulus_percentage, stimulus).concat(
+    getDistractors(trials_count, same_color_percentage, same_color_distractors),
+    getDistractors(trials_count, same_shape_percentage, same_shape_distractors),
+    getDistractors(trials_count, other_percentage, other_distractors)
+  );
+  return shuffle(all_trials);
+}
+
+function downloadCSV(data) {
+  let csv = data;
+  let link = document.createElement('a');
+  document.body.innerHTML += '<div style="position:absolute;width:100%;height:100%;opacity:0.3;z-index:100;background:#000;"></div>';
+  if (!csv.match(/^data:text\/csv/i)) {
+      csv = 'data:text/csv;charset=utf-8,' + csv;
+  }
+  let exportData = encodeURI(csv);
+  link.setAttribute('href', exportData);
+  link.setAttribute('download', 'experiment_results.csv');
+  link.innerText += "download";
+  document.body.innerHTML = '<h1 align="center">' + link.outerHTML + '</h1>';
+  link.click();
+}
+
+
 jsPsych.plugins["conjunctive-cpt"] = (function () {
 
   var plugin = {};
@@ -124,203 +246,88 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
 
   jsPsych.pluginAPI.registerPreload('conjunctive-cpt', 'stimulus', 'image');
 
-  const getRandomInterStimulusIntervalsTime = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  const getSquere = (width, height, color) => {
-    let squere = document.createElement('canvas');
-    squere.id = "squere";
-    squere.style.width = width + "cm";
-    squere.style.height = height + "cm";
-    squere.style.background = color;
-    squere.style.zIndex = 2;
-    squere.style.position = "absolute";
-    squere.style.display = "none";
-    return squere;
-  }
-
-  const getCircle = (width, height, color) => {
-    let circle = document.createElement('canvas');
-    circle.id = "circle";
-    circle.style.width = width + "cm";
-    circle.style.height = height + "cm";
-    circle.style.borderRadius = "50%";
-    circle.style.background = color;
-    circle.style.zIndex = 2;
-    circle.style.position = "absolute";
-    circle.style.display = "none";
-    return circle;
-  }
-
-  const getTriangle = (width, height, color) => {
-    let triangle = document.createElement('canvas');
-    triangle.id = "triangle";
-    triangle.style.width = 0;
-    triangle.style.height = 0;
-    triangle.style.borderLeft = width / 2 + "cm solid transparent";
-    triangle.style.borderRight = width / 2 + "cm solid transparent";
-    triangle.style.borderBottom = height + "cm solid " + color;
-    triangle.style.zIndex = 2;
-    triangle.style.position = "absolute";
-    triangle.style.display = "none";
-    return triangle;
-  }
-
-  const getStar = (width, height, color) => {
-    let star = document.createElement('canvas');
-    star.id = "star";
-    star.style.width = 0;
-    star.style.height = 0;
-    star.style.borderLeft = (width / 1.5) + "cm solid transparent";
-    star.style.borderTop = height + "cm solid " + color;
-    star.style.borderRight = (width / 1.5) + "cm solid transparent";
-    star.style.borderRadius = "50%";
-    star.style.zIndex = 2;
-    star.style.position = "absolute";
-    star.style.display = "none";
-    return star;
-  }
-
-
-  const shuffle = (array) => {
-    let currentIndex = array.length, randomIndex;
-
-    // While there remain elements to shuffle...
-    while (currentIndex != 0) {
-
-      // Pick a remaining element...
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex--;
-
-      // And swap it with the current element.
-      [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
-  }
-
   plugin.trial = function (display_element, trial) {
     let stimulus;
     let other_distractors = [];
-    let same_color_distractors = []
+    let same_color_distractors = [];
     let same_shape_distractors = [];
     switch (trial.stimulus_shape) {
       case "squere":
-        stimulus = getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
+        stimulus = Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
         for (var i in trial.other_colors) {
-          other_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          same_shape_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          same_shape_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
         }
-        same_color_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
         break;
       case "circle":
-        stimulus = getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
+        stimulus = Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
         for (var i in trial.other_colors) {
-          other_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          same_shape_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          same_shape_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
         }
-        same_color_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
         break;
       case "triangle":
         stimulus = getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
         for (var i in trial.other_colors) {
-          other_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          same_shape_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          same_shape_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
         }
-        same_color_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
         break;
       default:
-        stimulus = getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
+        stimulus = Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
         for (var i in trial.other_colors) {
-          other_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          other_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
-          same_shape_distractors.push(getStar(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          other_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
+          same_shape_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
         }
-        same_color_distractors.push(getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
-        same_color_distractors.push(getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
+        same_color_distractors.push(Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
         break;
     }
 
-    let all_trials = [];
-    const all_stimulus = new Array(trial.trials_count * (trial.stimulus_percentage / 100)).fill(stimulus);
-    let all_same_color_distractors = []
-    for (var dis in same_color_distractors) {
-      same_color_one_distractor = new Array(Math.floor(trial.trials_count * (trial.same_color_percentage / 100) / same_color_distractors.length)).fill(same_color_distractors[dis]);
-      all_same_color_distractors.push(...same_color_one_distractor);
-    }
-    for (var i = 0; i < trial.trials_count * (trial.same_color_percentage / 100) - all_same_color_distractors.length; i++) {
-      all_same_color_distractors.push(same_color_distractors[i]);
+
+    const getAllIni = () => {
+      let all_ini = [];
+      for (var i = 0; i < trial.inter_stimulus_interval_times.length; i++) {
+        one_ini = new Array(Math.floor(all_trials.length / trial.inter_stimulus_interval_times.length)).fill(trial.inter_stimulus_interval_times[i]);
+        all_ini.push(...one_ini);
+      }
+      return shuffle(all_ini);
     }
 
-    let all_same_shape_distractors = []
-    for (var dis in same_shape_distractors) {
-      console.log(trial.trials_count + " " + trial.same_shape_percentage + " " + same_shape_distractors.length);
-      same_shape_one_distractor = new Array(Math.floor(trial.trials_count * (trial.same_shape_percentage / 100) / same_shape_distractors.length)).fill(same_shape_distractors[dis]);
-      all_same_shape_distractors.push(...same_shape_one_distractor);
-    }
-    for (var i = 0; i < trial.trials_count * (trial.same_shape_percentage / 100) - all_same_shape_distractors.length; i++) {
-      all_same_shape_distractors.push(same_shape_distractors[i]);
-    }
+    other_percentage = 100 - trial.stimulus_percentage - trial.same_shape_percentage - trial.same_color_percentage;
+    const all_trials = getAllTrials(trial.trials_count, trial.stimulus_percentage, stimulus, trial.same_color_percentage, same_color_distractors, trial.same_shape_percentage, same_shape_distractors, other_percentage, other_distractors);
+    const all_ini = getAllIni();
 
-    let all_other_distractors = []
-    const other_percentage = 100 - trial.stimulus_percentage - trial.same_color_percentage - trial.same_shape_percentage;
-    for (var dis in other_distractors) {
-      other_one_distractor = new Array(Math.floor(trial.trials_count * (other_percentage / 100) / other_distractors.length)).fill(other_distractors[dis]);
-      all_other_distractors.push(...other_one_distractor);
-    }
-    for (var i = 0; i < trial.trials_count * (other_percentage / 100) - all_other_distractors.length; i++) {
-      all_other_distractors.push(other_distractors[i]);
-    }
-
-    all_trials = all_stimulus.concat(all_same_color_distractors, all_same_shape_distractors, all_other_distractors);
-
-    // Shuffle the stimuli
-    all_trials = shuffle(all_trials);
-
-    all_ini = [];
-    for (var i = 0; i < trial.inter_stimulus_interval_times.length; i++) {
-      one_ini = new Array(Math.floor(all_trials.length / trial.inter_stimulus_interval_times.length)).fill(trial.inter_stimulus_interval_times[i]);
-      all_ini.push(...one_ini);
-    }
-
-    all_ini = shuffle(all_ini);
     // Clear previous
     display_element.innerHTML = '';
 
     for (var index in all_trials) {
-      display_element.append(all_trials[index]);
+      display_element.append(all_trials[index].obj);
     }
 
     setTimeout(function () {
 
-      // Start timing for within trial ITI
-      var startCompute = Date.now();
-
       // Hide mouse
       var stylesheet = document.styleSheets[0];
       // stylesheet.insertRule("* {cursor: none;}", stylesheet.cssRules.length);
-
-      if (trial.stimulus_side < 0) {
-        stimulus_side = Math.round(Math.random());
-      } else {
-        stimulus_side = trial.stimulus_side;
-      }
 
       // this array holds handlers from setTimeout calls
       // that need to be cleared if the trial ends early
@@ -332,38 +339,23 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
         key: -1
       };
 
+      const startTime = new Date().getTime() / 1000;
+      let hidden = true;
+
       // function to end trial when it is time
       var end_trial = function () {
 
-        // gather the data to store for the trial
-        var trial_data = {
-          "rt": response.rt,
-          "stimulus": trial.stimulus,
-          "stimulus_side": stimulus_side,
-          "key_press": response.key,
-          "acc": (response.key == 68 & stimulus_side == 0) |
-            (response.key == 75 & stimulus_side == 1),
-          'animation_performance': mond,
-          'bProblem': bProblem,
-          'sProblem': sProblem,
-          'trial_began': trial_began
-        };
-
-        console.log("END");
+        downloadCSV(jsPsych.data.get().csv(), "data.csv");
 
         // move on to the next trial
         setTimeout(function () {
-          jsPsych.finishTrial(trial_data);
+          jsPsych.data.write(data);
+          //jsPsych.finishTrial(trial_data);
         }, 10);
-
       };
 
-      const startTime = new Date().getTime() / 1000;
-      let hidden = true;
-      let checked = false;
-
       // function to handle responses by the subject
-      var after_response = function (info) {
+      const after_response = function (info) {
         console.log(info)
         checked = true;
         // only record the first response
@@ -374,7 +366,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
         end_trial();
       };
 
-      var start_trial = function () {
+      const start_trial = function () {
         // start the response listener
         if (JSON.stringify(trial.choices) != JSON.stringify(["none"])) {
           var keyboardListener = jsPsych.pluginAPI.getKeyboardResponse({
@@ -384,25 +376,50 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
             persist: false,
             allow_held_key: false
           });
+        } 
+        try {
+          ccpt();
+        } catch (e) {
+          console.log("Catch: " + e);
+          end_trial();
         }
-        ccpt();
       };
 
-      var t = getStar(4, 4, trial.stimulus_color);
-      t.style.display = "initial";
-      display_element.append(t);
-
-      const ccpt = (index = 0) => {
-        hidden = !hidden;
-        all_trials[Math.floor(index)].style.display = hidden ? "none" : "initial";
-        console.log(all_trials[Math.floor(index)]);
-        console.log(index);
+      function ccpt (index = 0) {
         let current_time = (new Date().getTime() / 1000) - startTime;
+        let current_data = {
+          "current_time": current_time,
+          "shape": all_trials[Math.floor(index)].shape,
+          "color": all_trials[Math.floor(index)].color,
+          "cpt_index": Math.floor(index),
+        }
+        if (hidden) {
+          current_data = {
+            "type": "jspsych-conjunctive-cpt",
+            "current_time": current_time,
+            "shape": all_trials[Math.floor(index)].shape,
+            "color": all_trials[Math.floor(index)].color,
+            "cpt_index": Math.floor(index),
+          }
+        } else {
+          current_data = {
+            "type": "jspsych-conjunctive-cpt",
+            "current_time": current_time,
+            "inter_stimulus_interval_time": all_ini[Math.floor(index)],
+            "inter_stimulus_interval_index": Math.floor(index),
+          }
+        }
+        jsPsych.data.write(current_data);
+        hidden = !hidden;
+        all_trials[Math.floor(index)].obj.style.display = hidden ? "none" : "initial";
         if (current_time < 10000 && index < all_trials.length) {
           setTimeout(() => ccpt(index += 0.5),
             hidden ? all_ini[Math.floor(index)] : trial.stimulus_duration);
+        } else {
+          end_trial();
         }
       }
+
       start_trial();
     }, 100);
   };
