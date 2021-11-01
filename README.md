@@ -1,1 +1,2 @@
-# jsConjunctiveContinuousPerformanceTask
+# Conjunctive Continuous Performance Task jsPsych plugin
+## Based on Shalev, L., Ben-Simon, A., Mevorach, C., Cohen, Y., & Tsal, Y. (2011). Conjunctive Continuous Performance Task (CCPT)—A pure measure of sustained attention. Neuropsychologia, 49(9), 2584-2591.

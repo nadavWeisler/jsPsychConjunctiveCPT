@@ -98,13 +98,22 @@ function getDistractors(trials_count, percentage, distractors) {
   return all_distractors;
 }
 
-const getAllTrials = (trials_count, stimulus_percentage, stimulus, same_color_percentage, same_color_distractors, same_shape_percentage, same_shape_distractors, other_percentage, other_distractors) => {
+function getAllTrials (trials_count, stimulus_percentage, stimulus, same_color_percentage, same_color_distractors, same_shape_percentage, same_shape_distractors, other_percentage, other_distractors) {
   let all_trials = getAllStimulus(trials_count, stimulus_percentage, stimulus).concat(
     getDistractors(trials_count, same_color_percentage, same_color_distractors),
     getDistractors(trials_count, same_shape_percentage, same_shape_distractors),
     getDistractors(trials_count, other_percentage, other_distractors)
   );
   return shuffle(all_trials);
+}
+
+function getAllIni (trial_count, inter_stimulus_interval_times) {
+  let all_ini = [];
+  for (var i = 0; i < inter_stimulus_interval_times.length; i++) {
+    one_ini = new Array(Math.floor(trial_count / inter_stimulus_interval_times.length)).fill(inter_stimulus_interval_times[i]);
+    all_ini.push(...one_ini);
+  }
+  return shuffle(all_ini);
 }
 
 function downloadCSV(data) {
@@ -121,7 +130,6 @@ function downloadCSV(data) {
   document.body.innerHTML = '<h1 align="center">' + link.outerHTML + '</h1>';
   link.click();
 }
-
 
 jsPsych.plugins["conjunctive-cpt"] = (function () {
 
@@ -154,7 +162,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
       choices: {
         type: jsPsych.plugins.parameterType.KEYCODE,
         pretty_name: 'Response choices',
-        default: ['d', 'k']
+        default: [32]
       },
       stimulus_vertical_flip: {
         type: jsPsych.plugins.parameterType.INT,
@@ -251,6 +259,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
     let other_distractors = [];
     let same_color_distractors = [];
     let same_shape_distractors = [];
+    let current_time = 0;
     switch (trial.stimulus_shape) {
       case "squere":
         stimulus = Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
@@ -277,7 +286,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
         same_color_distractors.push(Shapes.getTriangleDown(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color));
         break;
       case "triangle":
-        stimulus = getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
+        stimulus = Shapes.getTriangle(trial.stimulus_min_width, trial.stimulus_min_height, trial.stimulus_color);
         for (var i in trial.other_colors) {
           other_distractors.push(Shapes.getSquere(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
           other_distractors.push(Shapes.getCircle(trial.stimulus_min_width, trial.stimulus_min_height, trial.other_colors[i]));
@@ -302,19 +311,9 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
         break;
     }
 
-
-    const getAllIni = () => {
-      let all_ini = [];
-      for (var i = 0; i < trial.inter_stimulus_interval_times.length; i++) {
-        one_ini = new Array(Math.floor(all_trials.length / trial.inter_stimulus_interval_times.length)).fill(trial.inter_stimulus_interval_times[i]);
-        all_ini.push(...one_ini);
-      }
-      return shuffle(all_ini);
-    }
-
     other_percentage = 100 - trial.stimulus_percentage - trial.same_shape_percentage - trial.same_color_percentage;
     const all_trials = getAllTrials(trial.trials_count, trial.stimulus_percentage, stimulus, trial.same_color_percentage, same_color_distractors, trial.same_shape_percentage, same_shape_distractors, other_percentage, other_distractors);
-    const all_ini = getAllIni();
+    const all_ini = getAllIni(all_trials.length, trial.inter_stimulus_interval_times);
 
     // Clear previous
     display_element.innerHTML = '';
@@ -339,6 +338,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
         key: -1
       };
 
+      let current_data = {}
       const startTime = new Date().getTime() / 1000;
       let hidden = true;
 
@@ -356,14 +356,23 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
 
       // function to handle responses by the subject
       const after_response = function (info) {
-        console.log(info)
-        checked = true;
+        console.log(info);
         // only record the first response
         if (response.key == -1) {
           response = info;
         }
 
-        end_trial();
+        current_time = (new Date().getTime() / 1000) - startTime;
+
+        let current_data = {
+          "current_time": current_time,
+          "shape": all_trials[Math.floor(index)].shape,
+          "color": all_trials[Math.floor(index)].color,
+          "cpt_index": Math.floor(index),
+          "response": info.key,
+        }
+
+        jsPsych.data.write(current_data);
       };
 
       const start_trial = function () {
@@ -373,7 +382,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
             callback_function: after_response,
             valid_responses: trial.choices,
             rt_method: 'performance',
-            persist: false,
+            persist: true,
             allow_held_key: false
           });
         } 
@@ -386,13 +395,7 @@ jsPsych.plugins["conjunctive-cpt"] = (function () {
       };
 
       function ccpt (index = 0) {
-        let current_time = (new Date().getTime() / 1000) - startTime;
-        let current_data = {
-          "current_time": current_time,
-          "shape": all_trials[Math.floor(index)].shape,
-          "color": all_trials[Math.floor(index)].color,
-          "cpt_index": Math.floor(index),
-        }
+        current_time = (new Date().getTime() / 1000) - startTime;
         if (hidden) {
           current_data = {
             "type": "jspsych-conjunctive-cpt",
