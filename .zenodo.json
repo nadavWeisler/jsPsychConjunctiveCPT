@@ -1,0 +1,29 @@
+{
+  "title": "Conjunctive Continuous Performance Task jsPsych plugin",
+  "description": "jsPsych 6 plugin and example timeline for the Conjunctive Continuous Performance Task (CCPT; Shalev et al., 2011), a sustained-attention task in which participants respond only to one shape-color conjunction. Zenodo assigns the DOI for this snapshot when it archives the GitHub release; the DOI is not set in this file.",
+  "upload_type": "software",
+  "license": "MIT",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Weisler, Nadav",
+      "orcid": "0009-0001-2729-5422",
+      "affiliation": "Shalvata Mental Health Center; Data Research Center for Mental Health and Rehabilitation, Clalit; Psychology Department, Hebrew University of Jerusalem"
+    }
+  ],
+  "keywords": [
+    "jsPsych",
+    "continuous performance task",
+    "CCPT",
+    "sustained attention",
+    "psychology"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.1016/j.neuropsychologia.2011.05.006",
+      "relation": "cites",
+      "scheme": "doi",
+      "resource_type": "publication-article"
+    }
+  ]
+}
