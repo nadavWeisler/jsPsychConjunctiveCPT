@@ -1,0 +1,53 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite it using the metadata from this file.
+  Zenodo assigns a DOI when it archives a GitHub release of this repository.
+  That DOI is intentionally omitted until the archive exists.
+type: software
+title: Conjunctive Continuous Performance Task jsPsych plugin
+version: 0.1.0
+date-released: "2026-09-27"
+license: MIT
+repository-code: https://github.com/nadavWeisler/jsPsychConjunctiveCPT
+url: https://github.com/nadavWeisler/jsPsychConjunctiveCPT
+abstract: >-
+  jsPsych 6 plugin and example timeline for the Conjunctive Continuous
+  Performance Task (CCPT), a sustained-attention task in which participants
+  respond only to one shape-color conjunction.
+keywords:
+  - jsPsych
+  - continuous performance task
+  - CCPT
+  - sustained attention
+  - psychology
+authors:
+  - family-names: Weisler
+    given-names: Nadav
+    orcid: https://orcid.org/0009-0001-2729-5422
+    affiliation: >-
+      Shalvata Mental Health Center; Data Research Center for Mental Health
+      and Rehabilitation, Clalit; Psychology Department, Hebrew University of
+      Jerusalem
+references:
+  - type: article
+    title: >-
+      Conjunctive Continuous Performance Task (CCPT)—A pure measure of
+      sustained attention
+    authors:
+      - family-names: Shalev
+        given-names: Lilach
+      - family-names: Ben-Simon
+        given-names: Anat
+      - family-names: Mevorach
+        given-names: Carmel
+      - family-names: Cohen
+        given-names: Yoav
+      - family-names: Tsal
+        given-names: Yehoshua
+    journal: Neuropsychologia
+    volume: 49
+    issue: 9
+    start: 2584
+    end: 2591
+    year: 2011
+    doi: 10.1016/j.neuropsychologia.2011.05.006
