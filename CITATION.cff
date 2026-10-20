@@ -1,8 +1,6 @@
 cff-version: 1.2.0
-message: >-
-  If you use this software, please cite it using the metadata from this file.
-  Zenodo assigns a DOI when it archives a GitHub release of this repository.
-  That DOI is intentionally omitted until the archive exists.
+message: If you use this software, please cite it using the metadata from this file.
+doi: 10.5281/zenodo.22990137
 type: software
 title: Conjunctive Continuous Performance Task jsPsych plugin
 version: 0.1.0
