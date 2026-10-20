@@ -24,6 +24,11 @@
       "relation": "cites",
       "scheme": "doi",
       "resource_type": "publication-article"
+    },
+    {
+      "identifier": "https://github.com/nadavWeisler/jsPsychConjunctiveCPT",
+      "relation": "isSupplementTo",
+      "scheme": "url"
     }
   ]
 }

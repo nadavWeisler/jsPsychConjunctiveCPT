@@ -1,5 +1,7 @@
 # Conjunctive Continuous Performance Task jsPsych plugin
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22990137.svg)](https://doi.org/10.5281/zenodo.22990137)
+
 A [jsPsych](https://www.jspsych.org/) 6 plugin and example timeline for the Conjunctive Continuous Performance Task (CCPT). In this sustained-attention task the participant responds only to one shape–color conjunction and withholds responses to the other combinations.
 
 The procedure follows Shalev, L., Ben-Simon, A., Mevorach, C., Cohen, Y., & Tsal, Y. (2011). Conjunctive Continuous Performance Task (CCPT)—A pure measure of sustained attention. *Neuropsychologia, 49*(9), 2584–2591. <https://doi.org/10.1016/j.neuropsychologia.2011.05.006>
@@ -70,7 +72,7 @@ Each finished trial stores `rt`, `key_press`, and `is_stimulus`. The saved `is_s
 
 ## Citation
 
-Cite this software with [`CITATION.cff`](CITATION.cff). Zenodo assigns a DOI when it archives a GitHub release of this repository. Add that DOI to `CITATION.cff` after the archive exists.
+Cite this software with [`CITATION.cff`](CITATION.cff) and the Zenodo concept DOI [10.5281/zenodo.22990137](https://doi.org/10.5281/zenodo.22990137).
 
 Also cite Shalev et al. (2011) when reporting CCPT results.
 
